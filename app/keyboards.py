@@ -1,12 +1,10 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton
-from app.database.requests import get_overworks, get_overworks_data
+from app.database.requests import get_accountings, get_overworks_data, get_overwork
 from aiogram.utils.keyboard import  InlineKeyboardBuilder
 
 main = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Создать новый учет переработок 📊')],
                                     [KeyboardButton(text='Все учёты 💼')],
-                                    [KeyboardButton(text='Изменить название учета переработок ✏️')],
-                                    [KeyboardButton(text='Удалить учёт 🗑️')],
-                                    [KeyboardButton(text='Вывод переработок в Exel 📈'),
+                                    [KeyboardButton(text='Вывод переработок в Exсel 📈'),
                                     KeyboardButton(text='Отправка переработок на почту 📧')]],
                            resize_keyboard= True,
                            input_field_placeholder='Выберите пункт меню....')
@@ -21,16 +19,42 @@ add_overwork = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Добави�
                         resize_keyboard=True,
                         input_field_placeholder='Выберите пункт меню....')
 
-async def overwork(user_id):
-    all_overworks = await get_overworks(user_id)
+skip_button = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Пропустить')]],
+                        resize_keyboard=True,
+                        input_field_placeholder='Выберите пункт меню....')
+
+accounting_buttons = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Изменить название учета переработок ✏️')],
+                                                   [KeyboardButton(text='Удалить учёт 🗑️')],
+                                                   [KeyboardButton(text='На главную')],
+                                                   ],
+                        resize_keyboard=True,
+                        input_field_placeholder='Выберите пункт меню....')
+async def accountings(user_id):
+    all_accountings = await get_accountings(user_id)
     keyboard = InlineKeyboardBuilder()
 
-    for overwork in all_overworks:
-        keyboard.add(InlineKeyboardButton(text=f"{overwork.name}", callback_data=f"overwork_{overwork.id}"))
+    for accounting in all_accountings:
+        keyboard.add(InlineKeyboardButton(text=f"{accounting.name}", callback_data=f"overwork_{accounting.id}"))
 
     return keyboard.adjust(1).as_markup()
 
+async def delete_accountings(user_id):
+    all_accountings = await get_accountings(user_id)
+    keyboard = InlineKeyboardBuilder()
 
+    for accounting in all_accountings:
+        keyboard.add(InlineKeyboardButton(text=f"{accounting.name}", callback_data=f"delete_{accounting.id}"))
+
+    return keyboard.adjust(1).as_markup()
+
+async def change_accountings(user_id):
+    all_accountings = await get_accountings(user_id)
+    keyboard = InlineKeyboardBuilder()
+
+    for accounting in all_accountings:
+        keyboard.add(InlineKeyboardButton(text=f"{accounting.name}", callback_data=f"change_{accounting.id}"))
+
+    return keyboard.adjust(1).as_markup()
 async def overwork_data(overwork_id):
     all_overworks_data = await get_overworks_data(overwork_id)
 
@@ -43,7 +67,7 @@ async def overwork_data(overwork_id):
 
     for data in all_overworks_data:
         formatted_date = data.date.strftime("%d.%m")
-        keyboard.add(InlineKeyboardButton(text=f'{formatted_date} - {data.work} - {data.sum} - {data.budget}', callback_data=f"data_{data.id}"))
+        keyboard.add(InlineKeyboardButton(text=f'{formatted_date} - {data.work} - {data.sum} руб - {data.budget}', callback_data=f"data_{data.id}"))
 
     return keyboard.adjust(1).as_markup()
 
@@ -60,3 +84,14 @@ async def overwork_data_regular():
 
     return regular_keyboard
 
+async def overwork_data_action(overwork_id):
+    keyboard = InlineKeyboardBuilder()
+    keyboard.add(InlineKeyboardButton(text=f"Изменить", callback_data=f"overworkchange_{overwork_id}"))
+    keyboard.add(InlineKeyboardButton(text=f"Удалить", callback_data=f"overworkdelete_{overwork_id}"))
+    return keyboard.adjust(1).as_markup()
+
+cancel = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Отмена')],
+                                                   ],  resize_keyboard=True,)
+
+on_main = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='На главную')],
+                                                   ],  resize_keyboard=True,)
