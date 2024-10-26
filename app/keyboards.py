@@ -38,6 +38,7 @@ async def accountings(user_id):
 
     return keyboard.adjust(1).as_markup()
 
+
 async def export_to_excel(user_id):
     all_accountings = await get_accountings(user_id)
     keyboard = InlineKeyboardBuilder()
@@ -46,6 +47,7 @@ async def export_to_excel(user_id):
         keyboard.add(InlineKeyboardButton(text=f"{accounting.name}", callback_data=f"export_excel_{accounting.id}"))
 
     return keyboard.adjust(1).as_markup()
+
 
 async def delete_accountings(user_id):
     all_accountings = await get_accountings(user_id)
@@ -99,12 +101,19 @@ async def overwork_data_action(overwork_id):
     keyboard.add(InlineKeyboardButton(text=f"Удалить", callback_data=f"overworkdelete_{overwork_id}"))
     return keyboard.adjust(1).as_markup()
 
+<<<<<<< HEAD
 skip_and_cancel = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Отмена')],
                                        [KeyboardButton(text='Пропустить')]],  resize_keyboard=True,)
 
+=======
+>>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
 cancel = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Отмена')],
                                                    ],  resize_keyboard=True,)
 
 on_main = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='На главную')],
+<<<<<<< HEAD
                                                    ],  resize_keyboard=True,)
 
+=======
+                                                   ],  resize_keyboard=True,)
+>>>>>>> 5805494cbb35c06feb099c107799c6658803b50e

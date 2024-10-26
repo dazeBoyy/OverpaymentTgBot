@@ -1,15 +1,10 @@
-import asyncio
+import logging
 import re
-
-import aiofiles
-from aiofiles import os
-from aiogram.client import bot
-from aiogram.filters import CommandStart, or_f, StateFilter
+from aiogram.filters import CommandStart, Command, or_f, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import Message, CallbackQuery, InputFile, FSInputFile
+from aiogram.types import Message, CallbackQuery
 from aiogram import Router, F, types
-from excel_utils import generate_excel
 import app.keyboards as keyboard
 import app.database.requests as rq
 
@@ -31,8 +26,6 @@ class NewOverWork(StatesGroup):
     sum = State()
     budget = State()
     picture = State()
-
-    overwork_for_change = None
 
 
 
@@ -126,15 +119,12 @@ async def set_accounting_name(message: Message,  state: FSMContext) -> None:
         f"Учёт успешно создан, либо был изменен! Теперь вы можете записывать ваши переработки, перейдя в раздел 'Все учёты'. И выбрать, только что созданный учёт или добавить данные, в уже существующий. 📝✨", reply_markup=keyboard.main)
     await state.clear()
     NewAccounting.accounting_for_change = None
-
-
 @router.callback_query(F.data.startswith('delete_'))
 async def delete_accounting_callback(callBack: CallbackQuery):
     accounting_id = callBack.data.split('_')[1]
     await rq.delete_accounting_orm(int(accounting_id))
     await callBack.answer("Учёт удалён❌")
     await callBack.message.answer("Учёт удалён!❌")
-
 
 @router.callback_query(F.data.startswith('overwork_'))
 async def get_overwoks_data(callBack: CallbackQuery, state: FSMContext):
@@ -186,6 +176,8 @@ async def delete_overwork_callback(callBack: CallbackQuery):
     await callBack.message.answer("Переработка удалёна!❌")
 
 
+=======
+>>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
 @router.message(F.text == 'Добавить переработку')
 async def add_overwork(message: Message,  state: FSMContext):
     await state.set_state(NewOverWork.date)
@@ -194,6 +186,7 @@ async def add_overwork(message: Message,  state: FSMContext):
     )
 
 
+<<<<<<< HEAD
 @router.message(NewOverWork.date,  or_f(F.text, F.text == "Пропустить"))
 async def set_date(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
@@ -301,6 +294,94 @@ async def set_budget(message: Message, state: FSMContext) -> None:
     await state.set_state(NewOverWork.picture)
     await message.answer(
         "Отправьте фото того, что вы делали, или нажмите кнопку 'Пропустить', если оно не требуется:", reply_markup=keyboard.skip_and_cancel
+=======
+@router.message(NewOverWork.date)
+async def set_date(message: Message, state: FSMContext) -> None:
+    date_pattern = re.compile(r'^\d{2}\.\d{2}$')
+
+    if not date_pattern.match(message.text):
+        await message.answer(
+            "Некорректный формат даты. Пожалуйста, введите дату в формате ДД.ММ, например, 05.01:"
+        )
+        return
+
+    await state.update_data(date=message.text)
+    await state.set_state(NewOverWork.work_name)
+    await message.answer(
+        "Опишите работу, которую вы выполняли:", reply_markup=keyboard.cancel
+    )
+
+
+@router.message(NewOverWork.work_name)
+async def set_work_name(message: Message, state: FSMContext) -> None:
+    if message.content_type != 'text':
+        await message.answer(
+            "Пожалуйста, введите текстовое описание работы, не более 120 символов."
+        )
+        return
+
+    work_name = message.text.strip()
+
+    if not work_name:
+        await message.answer(
+            "Вы не ввели описание работы. Пожалуйста, введите заново:"
+        )
+        return
+
+    if len(work_name) > 120:
+        await message.answer(
+            "Описание работы не должно превышать 120 символов. Пожалуйста, введите заново:"
+        )
+        return
+    await state.update_data(work_name=message.text)
+    await state.set_state(NewOverWork.sum)
+    await message.answer(
+        "Введите сумму работы:", reply_markup=keyboard.cancel
+    )
+
+
+@router.message(NewOverWork.sum)
+async def set_date(message: Message, state: FSMContext) -> None:
+    sum_value = message.text.strip()
+
+    if not sum_value.isdigit():
+        await message.answer(
+            "Сумма должна содержать только цифры. Пожалуйста, введите заново:"
+        )
+        return
+    await state.update_data(sum=int(message.text))
+    await state.set_state(NewOverWork.budget)
+    await message.answer(
+        "Введите чей был бюджет:", reply_markup=keyboard.cancel
+    )
+
+
+@router.message(NewOverWork.budget)
+async def set_budget(message: Message, state: FSMContext) -> None:
+    if message.content_type != 'text':
+        await message.answer(
+            "Пожалуйста, введите текстовое описание работы, не более 50 символов."
+        )
+        return
+
+    budget = message.text.strip()
+
+    if not budget:
+        await message.answer(
+            "Вы не ввели описание работы. Пожалуйста, введите заново:"
+        )
+        return
+
+    if len(budget) > 50:
+        await message.answer(
+            "Описание работы не должно превышать 50 символов. Пожалуйста, введите заново:"
+        )
+        return
+    await state.update_data(budget=message.text)
+    await state.set_state(NewOverWork.picture)
+    await message.answer(
+        "Отправьте фото того, что вы делали, или нажмите кнопку 'Пропустить', если оно не требуется:", reply_markup=keyboard.skip_button
+>>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
     )
 
 @router.message(NewOverWork.picture, or_f(F.photo, F.text == "Пропустить"))
@@ -310,6 +391,7 @@ async def set_picture(message: Message, state: FSMContext) -> None:
     else:
         await state.update_data(picture=message.photo[-1].file_id)
     data = await state.get_data()
+<<<<<<< HEAD
     overwork_id = NewOverWork.overwork_for_change.id if NewOverWork.overwork_for_change else None
 
     if overwork_id:
@@ -357,6 +439,20 @@ async def export_to_excel(callBack: CallbackQuery):
         # Обработка исключений
         await callBack.message.answer("Произошла ошибка при обработке файла: " + str(e))
 
+=======
+    await rq.add_overwork(  data['date'],
+                            data['work_name'],
+                            data['sum'],
+                            data['budget'],
+                            data['picture'],
+                            data['accounting_id']
+                            )
+    await message.answer(
+        f"Данные записаны✔️", reply_markup=keyboard.main)
+    await state.clear()
+
+
+>>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
 @router.message(F.text == 'На главную')
 async def back_to_main(message: Message):
     await message.answer("Вы вернулись на главную страничку😊", reply_markup=keyboard.main)
