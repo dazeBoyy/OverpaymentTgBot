@@ -176,8 +176,7 @@ async def delete_overwork_callback(callBack: CallbackQuery):
     await callBack.message.answer("Переработка удалёна!❌")
 
 
-=======
->>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
+
 @router.message(F.text == 'Добавить переработку')
 async def add_overwork(message: Message,  state: FSMContext):
     await state.set_state(NewOverWork.date)
@@ -186,7 +185,7 @@ async def add_overwork(message: Message,  state: FSMContext):
     )
 
 
-<<<<<<< HEAD
+
 @router.message(NewOverWork.date,  or_f(F.text, F.text == "Пропустить"))
 async def set_date(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
