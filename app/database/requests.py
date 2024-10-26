@@ -1,10 +1,7 @@
 import datetime
 
-<<<<<<< HEAD
 from sqlalchemy.ext.asyncio import AsyncSession
 
-=======
->>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
 from app.database.models import async_session, OverWorkData
 from app.database.models import User, Accounting
 from sqlalchemy import select, update, delete, insert, asc
@@ -68,7 +65,6 @@ async def get_overwork(overwork_id):
         return result.scalars().first()
 
 
-<<<<<<< HEAD
 async def change_overwork(overwork_id, data) -> None:
     async with async_session() as session:
         result = await session.execute(
@@ -107,8 +103,6 @@ async def delete_overwork(overwork_id):
             await session.commit()
 
 
-=======
->>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
 async def get_accounting_info_orm(accounting_id: int):
     async with async_session() as session:
         result = await session.execute(
@@ -117,10 +111,7 @@ async def get_accounting_info_orm(accounting_id: int):
         )
         return result.scalars().first()
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
 async def delete_accounting_orm(accounting_id: int):
     async with async_session() as session:
         accounting_to_delete = await session.get(Accounting, accounting_id)
@@ -145,7 +136,6 @@ async def change_accounting(accounting_id,
         else:
             # Обработка случая, если учёт с заданным ID не найден
             print(f"Учёт с ID {accounting_id} не найден.")
-<<<<<<< HEAD
 
 
 async def get_accounting_data(accounting_id):
@@ -174,5 +164,3 @@ async def get_accounting_data(accounting_id):
             ],
             "name": accounting_name  # Возвращаем название учёта
         }
-=======
->>>>>>> 5805494cbb35c06feb099c107799c6658803b50e
