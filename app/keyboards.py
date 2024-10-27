@@ -4,8 +4,7 @@ from aiogram.utils.keyboard import  InlineKeyboardBuilder
 
 main = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Создать новый учет переработок 📊')],
                                     [KeyboardButton(text='Все учёты 💼')],
-                                    [KeyboardButton(text='Вывод переработок в Exсel 📈'),
-                                    KeyboardButton(text='Отправка переработок на почту 📧')]],
+                                    [KeyboardButton(text='Вывод переработок в Exсel 📈'),]],
                            resize_keyboard= True,
                            input_field_placeholder='Выберите пункт меню....')
 
